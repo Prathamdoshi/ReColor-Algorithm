@@ -2,7 +2,7 @@
 from rembg import remove
 from PIL import Image
 import os
-
+import extcolors
 
 """
 Function: remove_background
@@ -11,9 +11,12 @@ Returns: None
 Purpose: Removes background of all the files in the input directory and pastes in output directory. 
 """
 
-def remove_background(input_path, output_path):
+input_path = "/Users/prathamdoshi/PycharmProjects/ReColor/raw_images/"
+output_path = "/Users/prathamdoshi/PycharmProjects/ReColor/images/"
 
-    for filename in os.listdir(input_path):
+inventory = {}
+
+for filename in os.listdir(input_path):
 
         input_path_formatted = os.path.join(input_path, filename)
         output_path_formatted = os.path.join(output_path, filename)
@@ -21,11 +24,27 @@ def remove_background(input_path, output_path):
 
         input = Image.open(input_path_formatted)
         output = remove(input)
+
+        colors, pixel_count = extcolors.extract_from_image(output)
+
+        print(f"{filename}")
+
+        max_val = 0
+
+        for c in colors:
+
+           # print(f"{c[0]}  :  {round(c[1] / pixel_count * 100, 2)}% ({c[1]})")
+
+           if round(c[1] / pixel_count * 100, 2) > max_val:
+
+                   max_val = round(c[1] / pixel_count * 100, 2)
+
+                   inventory[filename] = c[0]
+
+
+
+
+
         output.save(output_path_formatted)
 
-input_path = "/Users/prathamdoshi/PycharmProjects/ReColor/raw_images/"
-output_path = "/Users/prathamdoshi/PycharmProjects/ReColor/images/"
-
-# remove white background out of all the files in raw_images and images
-remove_background(input_path,output_path)
-
+print(inventory)
